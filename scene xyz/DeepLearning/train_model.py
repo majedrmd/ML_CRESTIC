@@ -8,15 +8,16 @@ To train a different model: edit config.py only!
 from utils.data_processing import load_data, create_sequences, split_data, to_tensors, make_loader
 from utils.model_training  import train_model
 from utils.model_eval      import evaluate_model
-from figures.plot            import plot_curves
+from figures.plot          import plot_curves
 from utils.config          import get_config, build_model
+
 # ══════════════════════════════════════════════════════════════
 # CONFIG — edit config.py to change any parameter
 # ══════════════════════════════════════════════════════════════
 cfg = get_config()
 
 # ══════════════════════════════════════════════════════════════
-# TRAINING PIPELINE — 
+# TRAINING PIPELINE — do not change below this line
 # ══════════════════════════════════════════════════════════════
 print("=" * 60)
 print("   LSTM Training — Pick and Place XYZ")

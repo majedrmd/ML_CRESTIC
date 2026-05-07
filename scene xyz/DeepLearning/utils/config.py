@@ -7,6 +7,7 @@ To change hyperparameters: edit get_config() only.
 
 from utils.model_def import PickPlaceLSTM
 
+
 def get_config():
     """
     Returns a dictionary with all hyperparameters and paths.
@@ -25,8 +26,8 @@ def get_config():
         "lr"           : 0.001,  # learning rate
         "batch_size"   : 32,     # batch size
         "patience"     : 10,     # early stopping patience
-        "weights_path" : "pickplace_lstm_weights.pth",
-        "plot_path"    : "lstm_training_curves.png",
+        "weights_path" : "models/pickplace_lstm_weights.pth",
+        "plot_path"    : "figures/lstm_training_curves.png",
     }
 
 

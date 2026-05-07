@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-model_training.py — Training loop with early stopping.
-"""
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -13,24 +9,7 @@ from sklearn.metrics import accuracy_score
 def train_model(model, train_loader, X_val_t, Y_val_t,
                 epochs=100, lr=0.001, patience=10,
                 save_path="pickplace_lstm_weights.pth"):
-    """
-    Train LSTM model with early stopping.
-    Saves best model weights automatically.
 
-    Args:
-        model        : PickPlaceLSTM instance
-        train_loader : DataLoader for training data
-        X_val_t      : validation input tensor
-        Y_val_t      : validation output tensor
-        epochs       : max number of training epochs (default 100)
-        lr           : learning rate for Adam optimizer (default 0.001)
-        patience     : early stopping patience (default 10)
-        save_path    : where to save best model weights
-
-    Returns:
-        train_losses, val_losses, train_accs, val_accs : lists of metrics per epoch
-        best_epoch : epoch where best model was saved
-    """
     criterion = nn.BCELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
@@ -41,7 +20,6 @@ def train_model(model, train_loader, X_val_t, Y_val_t,
     best_epoch       = 0
 
     for epoch in range(epochs):
-        # ── TRAIN ──────────────────────────────────────────
         model.train()
         epoch_loss          = 0
         all_preds, all_true = [], []
@@ -61,7 +39,6 @@ def train_model(model, train_loader, X_val_t, Y_val_t,
             np.concatenate(all_true).flatten(),
             np.concatenate(all_preds).flatten())
 
-        # ── VALIDATE ───────────────────────────────────────
         model.eval()
         with torch.no_grad():
             val_preds = model(X_val_t)
@@ -81,7 +58,6 @@ def train_model(model, train_loader, X_val_t, Y_val_t,
                   f"Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f} | "
                   f"Train Acc: {train_acc*100:.1f}% | Val Acc: {val_acc*100:.1f}%")
 
-        # ── EARLY STOPPING ─────────────────────────────────
         if val_loss < best_val_loss:
             best_val_loss    = val_loss
             patience_counter = 0
