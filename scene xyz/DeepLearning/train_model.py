@@ -170,34 +170,7 @@ print(f"  Best model saved at epoch {best_epoch}")
 model.load_state_dict(torch.load("pickplace_lstm_weights.pth"))
 print()
 
-# ── STEP 6: PLOT ──────────────────────────────────────────────
-print("Step 6 — Plotting loss and accuracy curves...")
-epochs_range = range(1, len(train_losses) + 1)
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
-ax1.plot(epochs_range, train_losses, 'b-', linewidth=2, label='Training Loss')
-ax1.plot(epochs_range, val_losses,   'r-', linewidth=2, label='Validation Loss')
-
-ax1.set_title('Loss Curves', fontsize=14, fontweight='bold')
-ax1.set_xlabel('Epoch'); ax1.set_ylabel('Loss (BCE)')
-ax1.legend(); ax1.grid(True, alpha=0.3)
-
-ax2.plot(epochs_range, train_accs, 'b-', linewidth=2, label='Training Accuracy')
-ax2.plot(epochs_range, val_accs,   'r-', linewidth=2, label='Validation Accuracy')
-
-ax2.set_title('Accuracy Curves', fontsize=14, fontweight='bold')
-ax2.set_xlabel('Epoch'); ax2.set_ylabel('Accuracy (%)')
-ax2.legend(); ax2.grid(True, alpha=0.3)
-ax2.set_ylim(0, 105)
-
-plt.suptitle('LSTM Training — Pick and Place XYZ\n'
-             f'N_PAST={N_PAST} | Hidden={HIDDEN_SIZE} | Patience={PATIENCE}',
-             fontsize=13, fontweight='bold')
-plt.tight_layout()
-plt.savefig("lstm_training_curves.png", dpi=150, bbox_inches='tight')
-plt.close()
-print("  Saved: lstm_training_curves.png")
-print()
 
 # ── STEP 7: EXTENDED METRICS ON TEST ─────────────────────────
 print("Step 7 — Extended metrics on test data...")
