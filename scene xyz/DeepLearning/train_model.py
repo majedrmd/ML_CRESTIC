@@ -5,12 +5,11 @@ All functions are imported from their respective modules.
 To train a different model: edit config.py only!
 """
 
-from data_processing     import load_data, create_sequences, split_data, to_tensors, make_loader
-from model_training import train_model
-from model_eval     import evaluate_model
-from plot           import plot_curves
-from config         import get_config, build_model
-
+from utils.data_processing import load_data, create_sequences, split_data, to_tensors, make_loader
+from utils.model_training  import train_model
+from utils.model_eval      import evaluate_model
+from figures.plot            import plot_curves
+from utils.config          import get_config, build_model
 # ══════════════════════════════════════════════════════════════
 # CONFIG — edit config.py to change any parameter
 # ══════════════════════════════════════════════════════════════

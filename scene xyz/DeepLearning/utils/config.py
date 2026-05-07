@@ -5,8 +5,7 @@ Used by train_lstm.py and diagnosis.py (and any future scripts).
 To change hyperparameters: edit get_config() only.
 """
 
-from model_def import PickPlaceLSTM
-
+from utils.model_def import PickPlaceLSTM
 
 def get_config():
     """
