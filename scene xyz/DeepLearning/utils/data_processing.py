@@ -1,32 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-lstm_utils.py — Utility functions for LSTM training
-All reusable functions are defined here.
-To train a different model, just import these functions
-and call them with different parameters.
-
-Usage:
-    from lstm_utils import load_data, create_sequences, split_data
-    from lstm_utils import train_model, evaluate_model, plot_curves
+data_utils.py — Data loading, sequence creation, splitting, and tensor conversion.
 """
 
 import numpy as np
 import pandas as pd
 import torch
-import torch.nn as nn
-import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import (accuracy_score, precision_score,
-                              recall_score, f1_score)
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
-
-# ═══════════════════════════════════════════════════════════════
-# 1. DATA FUNCTIONS
-# ═══════════════════════════════════════════════════════════════
 
 def load_data(csv_path, features):
     """
@@ -76,10 +58,10 @@ def split_data(X, Y, test_size=0.15, val_size=0.15, random_state=42):
     shuffle=False to preserve temporal order (important for time series).
 
     Args:
-        X, Y        : input and output arrays
-        test_size   : proportion for test set (default 15%)
-        val_size    : proportion for validation set (default 15%)
-        random_state: random seed for reproducibility
+        X, Y         : input and output arrays
+        test_size    : proportion for test set (default 15%)
+        val_size     : proportion for validation set (default 15%)
+        random_state : random seed for reproducibility
 
     Returns:
         X_train, X_val, X_test, Y_train, Y_val, Y_test
