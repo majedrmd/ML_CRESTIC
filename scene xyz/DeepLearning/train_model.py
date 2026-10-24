@@ -1,31 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-train_lstm.py — Main training script
-All functions are imported from lstm_utils.py
-To train a different model: change the CONFIG section only!
+train_lstm.py — Main training script.
+All functions are imported from their respective modules.
+To train a different model: edit config.py only!
 """
 
-from lstm_utils import (load_data, create_sequences, split_data,
-                         to_tensors, make_loader, train_model,
-                         evaluate_model, plot_curves, PickPlaceLSTM)
+from utils.data_processing import load_data, create_sequences, split_data, to_tensors, make_loader
+from utils.model_training  import train_model
+from utils.model_eval      import evaluate_model
+from figures.plot          import plot_curves
+from utils.config          import get_config, build_model
 
 # ══════════════════════════════════════════════════════════════
-# CONFIG — change only this section to adapt to a new model
+# CONFIG — edit config.py to change any parameter
 # ══════════════════════════════════════════════════════════════
-CSV_PATH    = "pickplace_records_1776331338.csv"
-FEATURES    = [
-    "box_at_place", "part_at_place", "detected", "c_limit",
-    "box_conveyor", "part_conveyor", "exit_conveyor", "c_plus", "grap"
-]
-N_PAST      = 10    # number of past states
-HIDDEN_SIZE = 64    # LSTM hidden neurons
-N_LAYERS    = 1     # LSTM layers
-EPOCHS      = 100   # max training epochs
-LR          = 0.001 # learning rate
-BATCH_SIZE  = 32    # batch size
-PATIENCE    = 10    # early stopping patience
-WEIGHTS_PATH = "pickplace_lstm_weights.pth"
-PLOT_PATH    = "lstm_training_curves.png"
+cfg = get_config()
 
 # ══════════════════════════════════════════════════════════════
 # TRAINING PIPELINE — do not change below this line
@@ -37,12 +26,12 @@ print()
 
 # 1. Load data
 print("Step 1 — Loading data...")
-data = load_data(CSV_PATH, FEATURES)
+data = load_data(cfg["csv_path"], cfg["features"])
 print()
 
 # 2. Create sequences
 print("Step 2 — Creating sequences...")
-X, Y = create_sequences(data, N_PAST)
+X, Y = create_sequences(data, cfg["n_past"])
 print()
 
 # 3. Split data
@@ -54,17 +43,13 @@ print()
 print("Step 4 — Preparing tensors...")
 X_train_t, X_val_t, X_test_t, Y_train_t, Y_val_t, Y_test_t = to_tensors(
     X_train, X_val, X_test, Y_train, Y_val, Y_test)
-train_loader = make_loader(X_train_t, Y_train_t, BATCH_SIZE)
-print(f"  Batch size={BATCH_SIZE} | Batches per epoch={len(train_loader)}")
+train_loader = make_loader(X_train_t, Y_train_t, cfg["batch_size"])
+print(f"  Batch size={cfg['batch_size']} | Batches per epoch={len(train_loader)}")
 print()
 
 # 5. Build model
 print("Step 5 — Building model...")
-model = PickPlaceLSTM(
-    input_size  = len(FEATURES),
-    hidden_size = HIDDEN_SIZE,
-    n_layers    = N_LAYERS,
-    output_size = len(FEATURES))
+model = build_model(cfg)
 print(model)
 print()
 
@@ -72,23 +57,26 @@ print()
 print("Step 6 — Training...")
 train_losses, val_losses, train_accs, val_accs, best_epoch = train_model(
     model, train_loader, X_val_t, Y_val_t,
-    epochs=EPOCHS, lr=LR, patience=PATIENCE,
-    save_path=WEIGHTS_PATH)
+    epochs    = cfg["epochs"],
+    lr        = cfg["lr"],
+    patience  = cfg["patience"],
+    save_path = cfg["weights_path"])
 print()
 
 # 7. Plot
 print("Step 7 — Plotting curves...")
 plot_curves(train_losses, val_losses, train_accs, val_accs,
-            best_epoch, N_PAST, HIDDEN_SIZE, PATIENCE, PLOT_PATH)
+            best_epoch, cfg["n_past"], cfg["hidden_size"],
+            cfg["patience"], cfg["plot_path"])
 print()
 
 # 8. Evaluate
 print("Step 8 — Evaluating on test data...")
-results = evaluate_model(model, X_test_t, Y_test_t, FEATURES)
+results = evaluate_model(model, X_test_t, Y_test_t, cfg["features"])
 
 print()
 print("=" * 60)
 print("   Training Complete!")
 print("=" * 60)
-print(f"  Weights : {WEIGHTS_PATH}")
-print(f"  Plot    : {PLOT_PATH}")
+print(f"  Weights : {cfg['weights_path']}")
+print(f"  Plot    : {cfg['plot_path']}")
