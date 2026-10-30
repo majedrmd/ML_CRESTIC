@@ -14,7 +14,7 @@ def get_config():
     Edit this function to adapt the model to a new scene or dataset.
     """
     return {
-        "csv_path"     : "pickplace_records_1776331338.csv",
+                "csv_path"     : "../data/raw/pickplace_records_1776331338.csv",
         "features"     : [
             "box_at_place", "part_at_place", "detected", "c_limit",
             "box_conveyor", "part_conveyor", "exit_conveyor", "c_plus", "grap"
