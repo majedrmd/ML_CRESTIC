@@ -23,7 +23,7 @@ import time
 import csv
 
 # ── CONNECTION CONFIG ─────────────────────────────────────────
-STUDENT_IP = "127.0.0.1"# student's machine IP
+STUDENT_IP = "172.20.10.2"  # student's machine IP
 PROXY_PORT = 5020             # secure proxy port — NOT 502!
 
 # ── PIN NUMBERS ───────────────────────────────────────────────
@@ -83,7 +83,7 @@ print(f"   Connecting to {STUDENT_IP}:{PROXY_PORT}...")
 print(f"   (through secure proxy — not direct Modbus)")
 print()
 
-c = ModbusClient(STUDENT_IP, port=PROXY_PORT)
+c = ModbusClient(STUDENT_IP, port=PROXY_PORT, auto_open=True, auto_close=False)
 c.open()
 
 if not c.is_open:
@@ -96,22 +96,32 @@ print("   Connected through secure proxy!")
 print("=" * 55)
 print()
 
+# ── SAFE READ HELPER ─────────────────────────────────────────
+def safe_read_di(pin, default=False):
+    """Read discrete input safely — returns default if None."""
+    result = c.read_discrete_inputs(pin)
+    return result[0] if result else default
+
+def safe_read_ir(pin, default=0):
+    """Read input register safely — returns default if None."""
+    result = c.read_input_registers(pin)
+    return result[0] if result else default
+
 # ── MAIN CONTROL LOOP ─────────────────────────────────────────
-while c.open():
+if c.is_open:
 
     # Initialization
-    box_at_place  = [c.read_discrete_inputs(pin_box_at_place)[0]] * 2
-    part_at_place = [c.read_discrete_inputs(pin_part_at_place)[0]] * 2
-    detected      = [c.read_discrete_inputs(pin_detected)[0]] * 2
-    c_limit       = [c.read_discrete_inputs(pin_c_limit)[0]] * 2
-    start         = [c.read_discrete_inputs(pin_start)[0]] * 2
-    reset         = [c.read_discrete_inputs(pin_reset)[0]] * 2
-    stop          = [c.read_discrete_inputs(pin_stop)[0]] * 2
-    emergency_stop = c.read_discrete_inputs(pin_emergency_stop)[0] 
-    print(f"Emergency stop value: {emergency_stop}")
-    x = [c.read_input_registers(pin_read_x)[0]] * 2
-    y = [c.read_input_registers(pin_read_y)[0]] * 2
-    z = [c.read_input_registers(pin_read_z)[0]] * 2
+    box_at_place   = [safe_read_di(pin_box_at_place)] * 2
+    part_at_place  = [safe_read_di(pin_part_at_place)] * 2
+    detected       = [safe_read_di(pin_detected)] * 2
+    c_limit        = [safe_read_di(pin_c_limit)] * 2
+    start          = [safe_read_di(pin_start)] * 2
+    reset          = [safe_read_di(pin_reset)] * 2
+    stop           = [safe_read_di(pin_stop)] * 2
+    emergency_stop = safe_read_di(pin_emergency_stop)
+    x = [safe_read_ir(pin_read_x)] * 2
+    y = [safe_read_ir(pin_read_y)] * 2
+    z = [safe_read_ir(pin_read_z)] * 2
 
     # Reset outputs
     box_conveyor  = False
@@ -140,20 +150,20 @@ while c.open():
 
     print(f"Ready — emergency_stop={emergency_stop}")
 
-    while emergency_stop == True:
+    while c.is_open:
 
         # Read sensors
-        box_at_place   = [box_at_place[-1],  c.read_discrete_inputs(pin_box_at_place)[0]]
-        part_at_place  = [part_at_place[-1], c.read_discrete_inputs(pin_part_at_place)[0]]
-        detected       = [detected[-1],      c.read_discrete_inputs(pin_detected)[0]]
-        c_limit        = [c_limit[-1],       c.read_discrete_inputs(pin_c_limit)[0]]
-        start          = [start[-1],         c.read_discrete_inputs(pin_start)[0]]
-        reset          = [reset[-1],         c.read_discrete_inputs(pin_reset)[0]]
-        stop           = [stop[-1],          c.read_discrete_inputs(pin_stop)[0]]
-        emergency_stop = c.read_discrete_inputs(pin_emergency_stop)[0]
-        x = [x[-1], c.read_input_registers(pin_read_x)[0]]
-        y = [y[-1], c.read_input_registers(pin_read_y)[0]]
-        z = [z[-1], c.read_input_registers(pin_read_z)[0]]
+        box_at_place   = [box_at_place[-1],  safe_read_di(pin_box_at_place)]
+        part_at_place  = [part_at_place[-1], safe_read_di(pin_part_at_place)]
+        detected       = [detected[-1],      safe_read_di(pin_detected)]
+        c_limit        = [c_limit[-1],       safe_read_di(pin_c_limit)]
+        start          = [start[-1],         safe_read_di(pin_start)]
+        reset          = [reset[-1],         safe_read_di(pin_reset)]
+        stop           = [stop[-1],          safe_read_di(pin_stop)]
+        emergency_stop = safe_read_di(pin_emergency_stop)
+        x = [x[-1], safe_read_ir(pin_read_x)]
+        y = [y[-1], safe_read_ir(pin_read_y)]
+        z = [z[-1], safe_read_ir(pin_read_z)]
 
         if event(start) == "RE": mode = "on"
         if event(stop)  == "RE": mode = "off"
