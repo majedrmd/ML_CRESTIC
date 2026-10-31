@@ -219,3 +219,6 @@ __marimo__/
 
 .vscode/
 *.key
+security_log_xyz.txt
+alerts_xyz.txt
+*.bin
